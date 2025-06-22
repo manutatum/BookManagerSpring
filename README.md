@@ -88,9 +88,9 @@ Elimina todos los libros.
 
 ```java
 public enum Status {
-    AVAILABLE,
-    BORROWED,
-    LOST
+    LEIDO,
+    EN_PROCESO,
+    PENDIENTE
 }
 ```
 
