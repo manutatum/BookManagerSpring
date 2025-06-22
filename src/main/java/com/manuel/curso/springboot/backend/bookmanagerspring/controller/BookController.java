@@ -1,49 +1,93 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.controller;
 
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.PageResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
+import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
+import com.manuel.curso.springboot.backend.bookmanagerspring.repository.BookRepository;
 import com.manuel.curso.springboot.backend.bookmanagerspring.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/books")
+@Tag(name = "Books", description = "Operaciones para gestionar los libros")
 public class BookController {
 
     @Autowired
     private BookService bookService;
 
+    @Operation(
+            summary = "Listar libros",
+            description = "Obtiene una lista paginada de libros, con la posibilidad de filtrar por autor ó titulo ó estado"
+    )
+    @ApiResponses( value =  {
+            @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente"),
+            @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping
-    public List<Book> listBooks() {
+    public ResponseEntity<PageResponseDto<Book>> listBooks(
+            @RequestParam Optional<String> title,
+            @RequestParam Optional<Status> status,
+            @RequestParam Optional<String> author,
+            @Parameter(hidden = true) Pageable pageable) {
 
-        return bookService.findAll();
+        Page<Book> page;
+
+        if (title.isPresent()){
+            page = bookService.findByTitle(title.get(), pageable);
+        } else if (status.isPresent()){
+            page = bookService.findByStatus(status.get(), pageable);
+        }else if (author.isPresent()){
+            page = bookService.findByAuthor(author.get(), pageable);
+        } else {
+            page = bookService.findAll(pageable);
+        }
+
+        return ResponseEntity.ok().body(new PageResponseDto<>(page));
 
     }
 
+    @Operation(
+            summary = "Mostrar un libro",
+            description = "Obtiene un libro"
+    )
+    @ApiResponses( value =  {
+            @ApiResponse(responseCode = "200", description = "Libro obtenido correctamente"),
+            @ApiResponse(responseCode = "404", description = "Libro no existente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> viewBook(@PathVariable Long id) {
 
         Optional<Book> optionalBook =  bookService.findById(id);
 
-        if (optionalBook.isPresent()) {
-            return ResponseEntity.ok().body(optionalBook.orElseThrow());
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "Book not found"));
+        return ResponseEntity.ok().body(optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")));
     }
 
+    @Operation(
+            summary = "Crear un nuevo libro",
+            description = "Crea un nuevo libro con sus respectivos campos"
+    )
+    @ApiResponses( value =  {
+            @ApiResponse(responseCode = "201", description = "Libro creado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping
-    public ResponseEntity<?> createBook(@Valid @RequestBody Book book, BindingResult result) {
-
-        if (result.hasFieldErrors()) {
-            return validation(result);
-        }
+    public ResponseEntity<?> createBook(@Valid @RequestBody Book book) {
 
         if (bookService.existsByTitle(book.getTitle())) return ResponseEntity.badRequest()
                 .body( Collections.singletonMap("message", "This book already exists") );
@@ -52,20 +96,32 @@ public class BookController {
 
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<?> updateBook(@Valid @RequestBody Book book, BindingResult result, @PathVariable Long id) {
-
-        if (result.hasFieldErrors()) {
-            return validation(result);
-        }
+    @Operation(
+            summary = "Editar un libro",
+            description = "Edita un libro ya existente"
+    )
+    @ApiResponses( value =  {
+            @ApiResponse(responseCode = "200", description = "Libro modificado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "404", description = "Libro no existente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateBook(@Valid @RequestBody Book book, @PathVariable Long id) {
 
         Optional<Book> optionalBook =  bookService.update(id, book);
 
-        if (optionalBook.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "Book not found"));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(optionalBook.orElseThrow());
+        return ResponseEntity.ok().body(optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")));
     }
 
+    @Operation(
+            summary = "Eliminar todos los libros",
+            description = "Elimina todos los libros que existan en la base de datos"
+    )
+    @ApiResponses( value =  {
+            @ApiResponse(responseCode = "202", description = "Libros eliminados correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @DeleteMapping
     public ResponseEntity<?> deleteAllBooks() {
 
@@ -74,24 +130,20 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap("message", "Books deleted"));
     }
 
-    @DeleteMapping("{id}")
+    @Operation(
+            summary = "Elimina un libro",
+            description = "Elimina un libro en concreto"
+    )
+    @ApiResponses( value =  {
+            @ApiResponse(responseCode = "202", description = "Libro eliminado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Libro no existente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Long id) {
 
         Optional<Book> optionalBook = bookService.deleteById(id);
 
-        if (optionalBook.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "Book not found"));
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap("message", "Book " + optionalBook.orElseThrow().getTitle() + " deleted"));
-    }
-
-    private ResponseEntity<?> validation(BindingResult result) {
-
-        Map<String, String> errors = result.getFieldErrors().stream()
-                .collect(Collectors.toMap(
-                        error -> error.getField(),
-                        error -> "El campo '" + error.getField() + "' " + error.getDefaultMessage()
-                ));
-
-        return ResponseEntity.badRequest().body(errors);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap("message", "Book " + optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")).getTitle() + " deleted"));
     }
 }

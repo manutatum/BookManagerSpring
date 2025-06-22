@@ -1,11 +1,14 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.service;
 
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
+import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import com.manuel.curso.springboot.backend.bookmanagerspring.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -15,8 +18,23 @@ public class BookServiceImpl implements BookService {
     private BookRepository bookRepository;
 
     @Override
-    public List<Book> findAll() {
-        return bookRepository.findAll();
+    public Page<Book> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Book> findByAuthor(String author, Pageable pageable) {
+        return bookRepository.findByAuthorContainingIgnoreCase(author, pageable);
+    }
+
+    @Override
+    public Page<Book> findByTitle(String title, Pageable pageable) {
+        return bookRepository.findByTitleContainingIgnoreCase(title, pageable);
+    }
+
+    @Override
+    public Page<Book> findByStatus(Status status, Pageable pageable) {
+        return bookRepository.findByStatusContainingIgnoreCase(status, pageable);
     }
 
     @Override
@@ -34,19 +52,14 @@ public class BookServiceImpl implements BookService {
 
         Optional<Book> updatedBook = bookRepository.findById(id);
 
-        if (updatedBook.isPresent()) {
+        Book bookDb =  updatedBook.orElseThrow(() -> new NoSuchElementException("Book not found"));
 
-            Book bookDb =  updatedBook.orElseThrow();
+        bookDb.setTitle(book.getTitle());
+        bookDb.setAuthor(book.getAuthor());
+        bookDb.setStatus(book.getStatus());
+        bookDb.setPublishDate(book.getPublishDate());
 
-            bookDb.setTitle(book.getTitle());
-            bookDb.setAuthor(book.getAuthor());
-            bookDb.setStatus(book.isStatus());
-            bookDb.setPublishDate(book.getPublishDate());
-
-            return Optional.of(bookRepository.save(bookDb));
-        }
-
-        return updatedBook;
+        return Optional.of(bookRepository.save(bookDb));
     }
 
     @Override

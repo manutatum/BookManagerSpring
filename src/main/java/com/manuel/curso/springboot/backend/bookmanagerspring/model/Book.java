@@ -1,10 +1,12 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -22,9 +24,11 @@ public class Book {
     private Long id;
 
     @NotBlank
+    @Size(min = 5, max = 100)
     private String title;
 
     @NotBlank
+    @Size(min = 5, max = 100)
     private String author;
 
     @NotNull
@@ -33,9 +37,8 @@ public class Book {
     private LocalDate publishDate;
 
     @NotNull
-    // Todo: Enum para diferentes status (Leido, en proceso, quiero leerlo, no disponible)
-    // De momento 1: leido 0: no leido
-    private boolean status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @CreatedDate
     @Column(updatable = false)
@@ -76,11 +79,11 @@ public class Book {
         this.publishDate = publishDate;
     }
 
-    public boolean isStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
