@@ -1,5 +1,7 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.service;
 
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookRequestDto;
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import org.springframework.data.domain.Page;
@@ -19,9 +21,9 @@ public interface BookService {
 
     Optional<Book> findById(Long id);
 
-    Book save(Book book);
+    BookResponseDto save(BookRequestDto book);
 
-    Optional<Book> update(Long id, Book book);
+    BookResponseDto update(Long id, BookRequestDto dto);
 
     void deleteAll();
 

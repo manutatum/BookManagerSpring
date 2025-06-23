@@ -1,9 +1,10 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.controller;
 
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookRequestDto;
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.dto.PageResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
-import com.manuel.curso.springboot.backend.bookmanagerspring.repository.BookRepository;
 import com.manuel.curso.springboot.backend.bookmanagerspring.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -74,7 +75,9 @@ public class BookController {
 
         Optional<Book> optionalBook =  bookService.findById(id);
 
-        return ResponseEntity.ok().body(optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")));
+        BookResponseDto bookResponseDto = new BookResponseDto(optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")));
+
+        return ResponseEntity.ok().body(bookResponseDto);
     }
 
     @Operation(
@@ -87,12 +90,12 @@ public class BookController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping
-    public ResponseEntity<?> createBook(@Valid @RequestBody Book book) {
+    public ResponseEntity<?> createBook(@Valid @RequestBody BookRequestDto dto) {
 
-        if (bookService.existsByTitle(book.getTitle())) return ResponseEntity.badRequest()
+        if (bookService.existsByTitle(dto.getTitle())) return ResponseEntity.badRequest()
                 .body( Collections.singletonMap("message", "This book already exists") );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.save(book));
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.save(dto));
 
     }
 
@@ -107,11 +110,11 @@ public class BookController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@Valid @RequestBody Book book, @PathVariable Long id) {
+    public ResponseEntity<?> updateBook(@Valid @RequestBody BookRequestDto dto, @PathVariable Long id) {
 
-        Optional<Book> optionalBook =  bookService.update(id, book);
+        BookResponseDto dtoResponse =  bookService.update(id, dto);
 
-        return ResponseEntity.ok().body(optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")));
+        return ResponseEntity.ok().body(dtoResponse);
     }
 
     @Operation(

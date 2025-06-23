@@ -1,5 +1,7 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.service;
 
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookRequestDto;
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import com.manuel.curso.springboot.backend.bookmanagerspring.repository.BookRepository;
@@ -43,23 +45,33 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book save(Book book) {
-        return bookRepository.save(book);
+    public BookResponseDto save(BookRequestDto dto) {
+
+        Book book = new Book();
+
+        book.setTitle(dto.getTitle());
+        book.setAuthor(dto.getAuthor());
+        book.setStatus(dto.getStatus());
+        book.setPublishDate(dto.getPublishDate());
+
+        Book bookDb = bookRepository.save(book);
+
+        return new BookResponseDto(bookDb);
     }
 
     @Override
-    public Optional<Book> update(Long id, Book book) {
+    public BookResponseDto update(Long id, BookRequestDto dto) {
 
         Optional<Book> updatedBook = bookRepository.findById(id);
 
         Book bookDb =  updatedBook.orElseThrow(() -> new NoSuchElementException("Book not found"));
 
-        bookDb.setTitle(book.getTitle());
-        bookDb.setAuthor(book.getAuthor());
-        bookDb.setStatus(book.getStatus());
-        bookDb.setPublishDate(book.getPublishDate());
+        bookDb.setTitle(dto.getTitle());
+        bookDb.setAuthor(dto.getAuthor());
+        bookDb.setStatus(dto.getStatus());
+        bookDb.setPublishDate(dto.getPublishDate());
 
-        return Optional.of(bookRepository.save(bookDb));
+        return new BookResponseDto(bookDb);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class RestExceptionHandler {
 
         Map<String, Object> errors = new HashMap<>();
 
-        errors.put("message", "JSON mal formado o datos incorrectos, formato deseado (dd/MM/yyyy)");
+        errors.put("message", "JSON mal formado o datos incorrectos");
         errors.put("status", HttpStatus.BAD_REQUEST.value());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
