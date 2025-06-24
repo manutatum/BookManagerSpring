@@ -11,23 +11,23 @@ import java.util.Optional;
 
 public interface BookService {
 
-    Page<Book> findAll(Pageable pageable);
+    Page<Book> findAll(String username, Pageable pageable);
 
-    Page<Book> findByAuthor(String author, Pageable pageable);
+    Page<Book> findByAuthor(String author, String username, Pageable pageable);
 
-    Page<Book> findByTitle(String title, Pageable pageable);
+    Page<Book> findByTitle(String title, String username, Pageable pageable);
 
-    Page<Book> findByStatus(Status status, Pageable pageable);
+    Page<Book> findByStatus(Status status, String username, Pageable pageable);
 
-    Optional<Book> findById(Long id);
+    Optional<Book> findById(Long id, String username);
 
     BookResponseDto save(BookRequestDto book);
 
-    BookResponseDto update(Long id, BookRequestDto dto);
+    BookResponseDto update(Long id, String username, BookRequestDto dto);
 
-    void deleteAll();
+    void deleteAll(String username);
 
-    Optional<Book> deleteById(Long id);
+    Optional<Book> deleteById(Long id, String username);
 
     boolean existsByTitle(String title);
 }

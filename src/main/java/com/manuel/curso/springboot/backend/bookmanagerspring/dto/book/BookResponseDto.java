@@ -33,6 +33,8 @@ public class BookResponseDto {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private Long userId;
+
     public BookResponseDto() {
     }
 
@@ -78,6 +80,14 @@ public class BookResponseDto {
 
     public Status getStatus() {
         return status;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void setStatus(Status status) {

@@ -49,6 +49,11 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/books").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/books").authenticated()
+                        .requestMatchers(HttpMethod.PUT,"/api/books/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/books").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/books/{id}").authenticated()
                         .anyRequest().authenticated()
                 )
                 //! AÑADIR FILTRO DE JWT

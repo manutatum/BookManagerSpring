@@ -3,11 +3,14 @@ package com.manuel.curso.springboot.backend.bookmanagerspring.service;
 import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookRequestDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
+import com.manuel.curso.springboot.backend.bookmanagerspring.model.User;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import com.manuel.curso.springboot.backend.bookmanagerspring.repository.BookRepository;
+import com.manuel.curso.springboot.backend.bookmanagerspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -19,29 +22,32 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
-    public Page<Book> findAll(Pageable pageable) {
-        return bookRepository.findAll(pageable);
+    public Page<Book> findAll(String username, Pageable pageable) {
+        return bookRepository.findAllByUser_Username(username, pageable);
     }
 
     @Override
-    public Page<Book> findByAuthor(String author, Pageable pageable) {
-        return bookRepository.findByAuthorContainingIgnoreCase(author, pageable);
+    public Page<Book> findByAuthor(String author, String username, Pageable pageable) {
+        return bookRepository.findByAuthorContainingIgnoreCaseAndUser_Username(author, username, pageable);
     }
 
     @Override
-    public Page<Book> findByTitle(String title, Pageable pageable) {
-        return bookRepository.findByTitleContainingIgnoreCase(title, pageable);
+    public Page<Book> findByTitle(String title, String username, Pageable pageable) {
+        return bookRepository.findByTitleContainingIgnoreCaseAndUser_Username(title, username, pageable);
     }
 
     @Override
-    public Page<Book> findByStatus(Status status, Pageable pageable) {
-        return bookRepository.findByStatusContainingIgnoreCase(status, pageable);
+    public Page<Book> findByStatus(Status status, String username, Pageable pageable) {
+        return bookRepository.findByStatusContainingIgnoreCaseAndUser_Username(status, username, pageable);
     }
 
     @Override
-    public Optional<Book> findById(Long id) {
-        return bookRepository.findById(id);
+    public Optional<Book> findById(Long id, String username) {
+        return bookRepository.findByIdAndUser_Username(id, username);
     }
 
     @Override
@@ -54,35 +60,49 @@ public class BookServiceImpl implements BookService {
         book.setStatus(dto.getStatus());
         book.setPublishDate(dto.getPublishDate());
 
+        User user = userRepository.findById(dto.getUserId()).orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        book.setUser(user);
+
         Book bookDb = bookRepository.save(book);
 
-        return new BookResponseDto(bookDb);
+        BookResponseDto bookResponseDto = new BookResponseDto(bookDb);
+
+        bookResponseDto.setUserId(bookDb.getUser().getId());
+
+        return bookResponseDto;
     }
 
     @Override
-    public BookResponseDto update(Long id, BookRequestDto dto) {
+    public BookResponseDto update(Long id, String username, BookRequestDto dto) {
 
-        Optional<Book> updatedBook = bookRepository.findById(id);
+        //? Buscamos el libro
+        Book bookDb = bookRepository.findByIdAndUser_Username(id, username).orElseThrow(() -> new NoSuchElementException("Book not found"));
 
-        Book bookDb =  updatedBook.orElseThrow(() -> new NoSuchElementException("Book not found"));
-
+        //? Cambiamos los datos
         bookDb.setTitle(dto.getTitle());
         bookDb.setAuthor(dto.getAuthor());
         bookDb.setStatus(dto.getStatus());
         bookDb.setPublishDate(dto.getPublishDate());
 
-        return new BookResponseDto(bookDb);
+        Book bookUpdated = bookRepository.save(bookDb);
+
+        BookResponseDto response = new BookResponseDto(bookUpdated);
+
+        response.setUserId(bookDb.getUser().getId());
+
+        return response;
     }
 
     @Override
-    public void deleteAll() {
-        bookRepository.deleteAll();
+    public void deleteAll(String username) {
+        bookRepository.deleteAllByUser_Username(username);
     }
 
     @Override
-    public Optional<Book> deleteById(Long id) {
+    public Optional<Book> deleteById(Long id, String username) {
 
-        Optional<Book> deletedBook = bookRepository.findById(id);
+        Optional<Book> deletedBook = bookRepository.findByIdAndUser_Username(id,username);
 
         deletedBook.ifPresent( book -> bookRepository.delete(book));
 

@@ -31,6 +31,8 @@ public class BookRequestDto {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private Long userId;
+
     public BookRequestDto() {
     }
 
@@ -39,6 +41,7 @@ public class BookRequestDto {
         this.author = book.getAuthor();
         this.publishDate = book.getPublishDate();
         this.status = book.getStatus();
+        this.userId = book.getUser().getId();
     }
 
     public Status getStatus() {
@@ -71,5 +74,13 @@ public class BookRequestDto {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

@@ -3,9 +3,12 @@ package com.manuel.curso.springboot.backend.bookmanagerspring.controller;
 import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookRequestDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.dto.PageResponseDto;
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.user.UserResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
+import com.manuel.curso.springboot.backend.bookmanagerspring.model.User;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import com.manuel.curso.springboot.backend.bookmanagerspring.service.BookService;
+import com.manuel.curso.springboot.backend.bookmanagerspring.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -29,6 +34,9 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private UserService userService;
 
     @Operation(
             summary = "Listar libros",
@@ -47,16 +55,18 @@ public class BookController {
             @RequestParam Optional<String> author,
             @Parameter(hidden = true) Pageable pageable) {
 
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
         Page<Book> page;
 
         if (title.isPresent()){
-            page = bookService.findByTitle(title.get(), pageable);
+            page = bookService.findByTitle(title.get(), username, pageable);
         } else if (status.isPresent()){
-            page = bookService.findByStatus(status.get(), pageable);
+            page = bookService.findByStatus(status.get(), username, pageable);
         }else if (author.isPresent()){
-            page = bookService.findByAuthor(author.get(), pageable);
+            page = bookService.findByAuthor(author.get(), username, pageable);
         } else {
-            page = bookService.findAll(pageable);
+            page = bookService.findAll(username, pageable);
         }
 
         return ResponseEntity.ok().body(new PageResponseDto<>(page));
@@ -75,8 +85,9 @@ public class BookController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<?> viewBook(@PathVariable Long id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Optional<Book> optionalBook =  bookService.findById(id);
+        Optional<Book> optionalBook =  bookService.findById(id, username);
 
         BookResponseDto bookResponseDto = new BookResponseDto(optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")));
 
@@ -95,6 +106,12 @@ public class BookController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping
     public ResponseEntity<?> createBook(@Valid @RequestBody BookRequestDto dto) {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserResponseDto userDto = userService.findByUsername(username);
+
+        dto.setUserId(userDto.getId());
 
         if (bookService.existsByTitle(dto.getTitle())) return ResponseEntity.badRequest()
                 .body( Collections.singletonMap("message", "This book already exists") );
@@ -117,7 +134,9 @@ public class BookController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(@Valid @RequestBody BookRequestDto dto, @PathVariable Long id) {
 
-        BookResponseDto dtoResponse =  bookService.update(id, dto);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        BookResponseDto dtoResponse =  bookService.update(id, username, dto);
 
         return ResponseEntity.ok().body(dtoResponse);
     }
@@ -134,7 +153,9 @@ public class BookController {
     @DeleteMapping
     public ResponseEntity<?> deleteAllBooks() {
 
-        bookService.deleteAll();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        bookService.deleteAll(username);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap("message", "Books deleted"));
     }
@@ -152,7 +173,9 @@ public class BookController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Long id) {
 
-        Optional<Book> optionalBook = bookService.deleteById(id);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Optional<Book> optionalBook = bookService.deleteById(id, username);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap("message", "Book " + optionalBook.orElseThrow(() -> new NoSuchElementException("Book not found")).getTitle() + " deleted"));
     }

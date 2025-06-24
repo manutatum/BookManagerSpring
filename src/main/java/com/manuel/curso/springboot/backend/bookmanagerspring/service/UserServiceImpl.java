@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -24,6 +26,14 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserResponseDto findByUsername(String username) {
+
+        User user = userRepository.findByUsername(username).orElseThrow( () -> new NoSuchElementException("User with username " + username + " not found!") );
+
+        return new UserResponseDto(user);
+    }
 
     @Override
     public UserResponseDto saveUser(UserRequestDto dto) {

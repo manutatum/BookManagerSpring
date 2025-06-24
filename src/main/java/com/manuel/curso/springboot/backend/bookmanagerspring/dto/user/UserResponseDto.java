@@ -1,10 +1,14 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.dto.user;
 
+import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookResponseDto;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Role;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.User;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserResponseDto {
 
@@ -16,6 +20,8 @@ public class UserResponseDto {
 
     private boolean enabled;
 
+    private List<BookResponseDto> books;
+
     public UserResponseDto() {
     }
 
@@ -24,6 +30,12 @@ public class UserResponseDto {
         this.username = user.getUsername();
         this.roles = user.getRoles();
         this.enabled = user.isEnabled();
+        this.books = user.getBooks() != null
+                ? user.getBooks()
+                .stream()
+                .map(BookResponseDto::new)
+                .collect(Collectors.toList())
+                : Collections.emptyList();
     }
 
     public Long getId() {
@@ -56,5 +68,13 @@ public class UserResponseDto {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public List<BookResponseDto> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<BookResponseDto> bookResponseDtos) {
+        this.books = bookResponseDtos;
     }
 }

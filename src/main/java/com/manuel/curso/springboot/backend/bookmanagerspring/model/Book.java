@@ -1,5 +1,6 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import jakarta.persistence.*;
@@ -47,6 +48,11 @@ public class Book {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
+
     public Long getId() {
         return id;
     }
@@ -85,6 +91,14 @@ public class Book {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public LocalDateTime getCreatedAt() {
