@@ -1,4 +1,4 @@
-package com.manuel.curso.springboot.backend.bookmanagerspring.configuration;
+package com.manuel.curso.springboot.backend.bookmanagerspring.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.servers.Server;

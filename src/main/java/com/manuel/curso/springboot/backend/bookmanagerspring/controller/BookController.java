@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -38,6 +39,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping
     public ResponseEntity<PageResponseDto<Book>> listBooks(
             @RequestParam Optional<String> title,
@@ -70,6 +72,7 @@ public class BookController {
             @ApiResponse(responseCode = "404", description = "Libro no existente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<?> viewBook(@PathVariable Long id) {
 
@@ -89,6 +92,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping
     public ResponseEntity<?> createBook(@Valid @RequestBody BookRequestDto dto) {
 
@@ -109,6 +113,7 @@ public class BookController {
             @ApiResponse(responseCode = "404", description = "Libro no existente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(@Valid @RequestBody BookRequestDto dto, @PathVariable Long id) {
 
@@ -125,6 +130,7 @@ public class BookController {
             @ApiResponse(responseCode = "202", description = "Libros eliminados correctamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping
     public ResponseEntity<?> deleteAllBooks() {
 
@@ -142,6 +148,7 @@ public class BookController {
             @ApiResponse(responseCode = "404", description = "Libro no existente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable Long id) {
 

@@ -1,4 +1,4 @@
-package com.manuel.curso.springboot.backend.bookmanagerspring.configuration;
+package com.manuel.curso.springboot.backend.bookmanagerspring.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
