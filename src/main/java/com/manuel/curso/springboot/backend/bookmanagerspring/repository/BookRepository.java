@@ -20,7 +20,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findByTitleContainingIgnoreCaseAndUser_Username(String title, String username, Pageable pageable);
 
-    Page<Book> findByStatusContainingIgnoreCaseAndUser_Username(Status status, String username, Pageable pageable);
+    Page<Book> findByStatusAndUser_Username(Status status, String username, Pageable pageable);
 
     Optional<Book> findByIdAndUser_Username(Long id, String username);
 

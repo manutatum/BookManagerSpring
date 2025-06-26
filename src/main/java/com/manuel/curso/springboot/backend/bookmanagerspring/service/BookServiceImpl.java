@@ -42,7 +42,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<Book> findByStatus(Status status, String username, Pageable pageable) {
-        return bookRepository.findByStatusContainingIgnoreCaseAndUser_Username(status, username, pageable);
+        return bookRepository.findByStatusAndUser_Username(status, username, pageable);
     }
 
     @Override

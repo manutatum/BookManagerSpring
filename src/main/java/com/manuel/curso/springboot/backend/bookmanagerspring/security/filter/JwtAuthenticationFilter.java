@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .add("username", username)
                 .build();
 
-        String token = Jwts.builder()
+        String accessToken = Jwts.builder()
                 .subject(username)
                 //? AÑADIRLE DATOS AL JWT
                 .claims(claims)
@@ -80,12 +80,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .signWith(SECRET_KEY)
                 .compact();
 
-        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
+        // TODO: REFRESH TOKEN
+
+        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + accessToken);
 
         Map<String, String> body = new HashMap<>();
 
         body.put("username", username);
-        body.put("token", token);
+        body.put("token", accessToken);
         body.put("message", String.format("Hola %s has iniciado sesión con éxito", username));
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(body));

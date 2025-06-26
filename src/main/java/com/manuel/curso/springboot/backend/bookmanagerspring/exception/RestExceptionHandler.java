@@ -1,5 +1,6 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.exception;
 
+import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.Status;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -53,7 +55,14 @@ public class RestExceptionHandler {
     public ResponseEntity<?> handleRegisterValidation(IllegalArgumentException ex) {
         Map<String, Object> errors = new HashMap<>();
 
-        errors.put("message", ex.getMessage());
+        if (ex.getMessage() != null && ex.getMessage().startsWith("No enum constant")) {
+
+            errors.put("message", "El estado proporcionado es inválido. Usa uno de los valores permitidos: " + Arrays.toString(Status.values()));
+
+        } else {
+            errors.put("message", ex.getMessage());
+        }
+
         errors.put("status", HttpStatus.BAD_REQUEST.value());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
