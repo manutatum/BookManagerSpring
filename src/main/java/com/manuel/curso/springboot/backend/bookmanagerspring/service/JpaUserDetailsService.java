@@ -24,11 +24,7 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Optional<User> optionalUser = repository.findByUsername(username);
-
-        if (optionalUser.isEmpty()) throw new UsernameNotFoundException(String.format("Username %s no existe en el sistema", username));
-
-        User user = optionalUser.orElseThrow();
+        User user = repository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(String.format("Username %s no existe en el sistema", username)));
 
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(

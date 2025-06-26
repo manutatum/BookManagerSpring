@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -27,6 +28,35 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public UserResponseDto disabledUser(Long id) {
+
+        User user = userRepository.findById(id).orElseThrow(() ->  new NoSuchElementException("User not found"));
+
+        user.setEnabled(false);
+
+        User userUpdated = userRepository.save(user);
+
+        return new UserResponseDto(userUpdated);
+    }
+
+    @Override
+    public UserResponseDto enabledUser(Long id) {
+
+        User user = userRepository.findById(id).orElseThrow(() ->  new NoSuchElementException("User not found"));
+
+        user.setEnabled(true);
+
+        User userUpdated = userRepository.save(user);
+
+        return new UserResponseDto(userUpdated);
+    }
 
     @Override
     public UserResponseDto findByUsername(String username) {
@@ -61,7 +91,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Page<User> findAllUsers(Pageable pageable) {
+    public Page<User> findAllUsersPaginated(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
 
@@ -74,5 +104,7 @@ public class UserServiceImpl implements UserService{
 
         return new UserResponseDto(user);
     }
+
+
 
 }

@@ -106,7 +106,7 @@ public class User {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && Objects.equals(username, user.username);
+        return Objects.equals(id, user.id) && Objects.equals(username, user.username);
     }
 
     @Override

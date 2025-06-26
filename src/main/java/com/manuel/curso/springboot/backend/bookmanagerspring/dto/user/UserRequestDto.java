@@ -1,7 +1,6 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

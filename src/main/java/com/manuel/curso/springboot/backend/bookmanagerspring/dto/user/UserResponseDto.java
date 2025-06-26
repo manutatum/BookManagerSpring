@@ -1,11 +1,9 @@
 package com.manuel.curso.springboot.backend.bookmanagerspring.dto.user;
 
 import com.manuel.curso.springboot.backend.bookmanagerspring.dto.book.BookResponseDto;
-import com.manuel.curso.springboot.backend.bookmanagerspring.model.Book;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.Role;
 import com.manuel.curso.springboot.backend.bookmanagerspring.model.User;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
