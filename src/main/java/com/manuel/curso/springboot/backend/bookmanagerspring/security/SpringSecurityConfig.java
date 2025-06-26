@@ -54,6 +54,8 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/books/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE,"/api/books").authenticated()
                         .requestMatchers(HttpMethod.DELETE,"/api/books/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/admin/usuarios").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/admin/books").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 //! AÑADIR FILTRO DE JWT

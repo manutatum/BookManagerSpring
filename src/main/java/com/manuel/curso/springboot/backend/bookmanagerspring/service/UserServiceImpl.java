@@ -8,12 +8,13 @@ import com.manuel.curso.springboot.backend.bookmanagerspring.model.enums.ERole;
 import com.manuel.curso.springboot.backend.bookmanagerspring.repository.RoleRepository;
 import com.manuel.curso.springboot.backend.bookmanagerspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -39,7 +40,7 @@ public class UserServiceImpl implements UserService{
     public UserResponseDto saveUser(UserRequestDto dto) {
 
         //? COMPROBAMOS QUE EL REPAS Y LA PASS SEAN IGUALES, QUE NO EXISTA USUARIO CON ESE NOMBRE
-        if ( !dto.getPassword().equals(dto.getRePassword()) ) throw new IllegalArgumentException("Passwords don't match");
+        if ( !dto.getPassword().equals(dto.getRepassword()) ) throw new IllegalArgumentException("Passwords don't match");
 
         if ( userRepository.existsByUsername(dto.getUsername()) ) throw new IllegalArgumentException("Username already exists");
 
@@ -57,6 +58,21 @@ public class UserServiceImpl implements UserService{
 
         return new UserResponseDto(userRepository.save(user));
 
+    }
+
+    @Override
+    public Page<User> findAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
+    public UserResponseDto deleteUserById(Long id) {
+
+        User user = userRepository.findById(id).orElseThrow(() ->  new NoSuchElementException("User with username " + id + " not found!"));
+
+        userRepository.delete(user);
+
+        return new UserResponseDto(user);
     }
 
 }

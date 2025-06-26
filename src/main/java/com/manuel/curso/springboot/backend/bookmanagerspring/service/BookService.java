@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public interface BookService {
 
+    Page<Book> findAllAdmin(Pageable pageable);
+
     Page<Book> findAll(String username, Pageable pageable);
 
     Page<Book> findByAuthor(String author, String username, Pageable pageable);

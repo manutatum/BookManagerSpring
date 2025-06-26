@@ -26,6 +26,11 @@ public class BookServiceImpl implements BookService {
     private UserRepository userRepository;
 
     @Override
+    public Page<Book> findAllAdmin(Pageable pageable) {
+        return bookRepository.findAll(pageable);
+    }
+
+    @Override
     public Page<Book> findAll(String username, Pageable pageable) {
         return bookRepository.findAllByUser_Username(username, pageable);
     }

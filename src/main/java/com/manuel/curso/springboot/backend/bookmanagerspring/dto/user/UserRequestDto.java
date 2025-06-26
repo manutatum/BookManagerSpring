@@ -18,7 +18,7 @@ public class UserRequestDto {
 
     @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String rePassword;
+    private String repassword;
 
     public UserRequestDto() {
     }
@@ -44,11 +44,11 @@ public class UserRequestDto {
         this.password = password;
     }
 
-    public String getRePassword() {
-        return rePassword;
+    public String getRepassword() {
+        return repassword;
     }
 
-    public void setRePassword(String rePassword) {
-        this.rePassword = rePassword;
+    public void setRepassword(String repassword) {
+        this.repassword = repassword;
     }
 }

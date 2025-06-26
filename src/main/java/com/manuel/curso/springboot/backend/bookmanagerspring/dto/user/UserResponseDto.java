@@ -28,7 +28,7 @@ public class UserResponseDto {
     public UserResponseDto(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
-        this.roles = user.getRoles();
+        this.roles = user.getRoles() != null ? user.getRoles() : Collections.emptyList();
         this.enabled = user.isEnabled();
         this.books = user.getBooks() != null
                 ? user.getBooks()
