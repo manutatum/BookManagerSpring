@@ -7,22 +7,25 @@ API RESTful construida con **Spring Boot 3** para la gestión de libros. Permite
 - Java 17
 - Spring Boot 3
 - Spring Data JPA
+- Spring Security + JWT
 - Hibernate
 - MySQL
 - Swagger/OpenAPI (SpringDoc)
 - Maven
+- OpenPDF
 
 ## 🧱 Estructura del proyecto
 
 ```bash
 src/main/java/com/manuel/curso/springboot/backend/bookmanagerspring/
-├── configuration     # Configuraciones
+├── config    # Configuraciones
 ├── controller        # Controladores REST
 ├── dto               # Clases para respuestas personalizadas
 ├── exception         # Clase para manejar excepciones
 ├── model             # Entidades JPA
 │   └── enums         # Enumeraciones (Status)
 ├── repository        # Repositorios JPA
+├── security        # Spring Security
 ├── service           # Servicios e interfaces
 └── BookManagerSpringApplication.java
 ```
@@ -83,6 +86,50 @@ Elimina un libro por ID.
 ### 🧹 DELETE /api/books
 
 Elimina todos los libros.
+
+### 📄 POST /api/auth/register
+
+Registra un usuario con el siguiente formato:
+```json
+{
+  "username": "username",
+  "password": "password",
+  "repassword": "repassword"
+}
+```
+### 📄 POST /api/auth/login
+
+Loguear un usuario para obtener su token con el siguiente formato:
+```json
+{
+  "username": "username",
+  "password": "password"
+}
+```
+
+### 📄 GET /api/admin/users
+
+Obtiene todos los usuarios.
+
+### 📄 GET /api/admin/books
+
+Obtiene todos los usuarios.
+
+### 📄 DELETE /api/admin/users/{id}
+
+Borra ese usuario.
+
+### 📄 GET /api/admin/users/export/pdf
+
+Crea un pdf con un listado de todos los usuarios registrados.
+
+### 📄 GET /api/admin/users/disabled/{id}
+
+Deshabilita el usuario.
+
+### 📄 GET /api/admin/users/enabled/{id}
+
+Habilita el usuario.
 
 ## 🗂 Status (Enum)
 
