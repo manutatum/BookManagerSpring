@@ -151,4 +151,4 @@ Se utiliza @Valid en los controladores para asegurar integridad de datos.
 
 ## 👤 Autor
 Manuel Jiménez
-[Visita mi portfolio](https://manueljimenez.es)
+[Visita mi portfolio]()
